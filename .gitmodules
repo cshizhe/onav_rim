@@ -1,0 +1,3 @@
+[submodule "dependencies/habitat-sim"]
+	path = dependencies/habitat-sim
+	url = https://github.com/Ram81/habitat-sim.git

@@ -1,0 +1,12 @@
+jsonlines>=4.0.0
+opencv-python>=3.3.0
+lmdb>=1.4.0
+msgpack>=1.0.0
+msgpack_numpy>=0.4.0
+yacs>=0.1.5
+gym>=0.17.3
+tensorboardX>=2.6
+scikit-image>=0.17.2
+einops>=0.6.0
+filelock>=3.0.0
+numpy==1.23.5

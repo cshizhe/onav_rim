@@ -1,0 +1,123 @@
+# Note:  This is an example config, see habitat_baselines/config/pointnav/ppo_pointnav.yaml
+# for better hyperparameters for actual trainingsem_seg_pred
+
+BASE_TASK_CONFIG_PATH: "configs/tasks/objectnav_mp3d_il.yaml"
+TRAINER_NAME: "ddp-il-trainer"
+ENV_NAME: NavRLEnv
+SIMULATOR_GPU_ID: 0
+TORCH_GPU_ID: 0
+VIDEO_OPTION: [] #["disk"]
+TENSORBOARD_DIR: "data/exprs/bc/tb"
+VIDEO_DIR: "data/exprs/bc/video_dir"
+# To evaluate on all episodes, set this to -1
+TEST_EPISODE_COUNT: -1
+EVAL_CKPT_PATH_DIR: "data/exprs/bc/objectnav_semseg.ckpt"
+SHOW_TOP_DOWN_MAP: False
+NUM_PROCESSES: 8
+CHECKPOINT_FOLDER: "data/exprs/bc/ckpts"
+OUTPUT_LOG_DIR: "data/exprs/bc/logs"
+LOG_FILE: "data/exprs/bc/train.log"
+LOG_INTERVAL: 10
+LOG_METRICS: True
+CHECKPOINT_INTERVAL: 500
+SENSORS: ['RGB_SENSOR', 'SEMANTIC_SENSOR', 'DEPTH_SENSOR']
+RESULTS_DIR: "data/exprs/bc/sem_seg_pred/{split}/{type}"
+EVAL_RESULTS_DIR: "data/exprs/bc/results/"
+EVAL_SAVE_RESULTS: True
+EVAL_SAVE_RESULTS_INTERVAL: 50
+EVAL:
+  SPLIT: "val"
+NUM_UPDATES: 16000
+EVAL_CKPT_FROM_OFFLINEBC: False
+
+EPISODE_ITERATIVE: False
+
+IL:
+  POLICY:
+    name: "ObjectNavILPolicy"
+  USE_IW: True
+  distrib_backend: GLOO
+  BehaviorCloning:
+    lr: 0.001
+    eps: 1.0e-5
+    clip_param: 0.2
+    num_mini_batch: 2
+    max_grad_norm: 0.2
+    num_steps: 128
+    use_linear_clip_decay: False
+    use_linear_lr_decay: True
+    reward_window_size: 50
+    sync_frac: 0.6
+
+RL:
+  SUCCESS_REWARD: 2.5
+  SLACK_REWARD: -1e-3
+
+MODEL:
+  model_class: "ObjectNavTransformer"
+  action_clf_class: "linear" # ClsPrediction, linear, null
+  encoder_type: 'add' # concat, concat_linear, add
+  encoder_add_objgoal: True
+  num_ft_views: 1
+  hidden_size: 512
+  enc_collide_steps: False
+  gpscompass_noise_type: null # null, zero, gaussian
+
+  obj_embed_file: null
+  # obj_embed_file: 'data/datasets/objectnav/object_category_embeds_st_clip_RN50.npy'
+
+  dropout_rate: 0.1
+  ablate_depth: False
+  ablate_rgb: False
+  num_recurrent_layers: 2
+  rnn_type: "GRU"
+  backbone: "resnet18"
+  resnet_baseplanes: 32
+  normalize_visual_inputs: False
+  force_blind_policy: False
+  embed_sge: False
+  embed_goal_seg: False
+  sem_seg_pred: False
+  NO_VISION: False
+  USE_SEMANTICS: False
+  USE_PRED_SEMANTICS: False
+  SWITCH_TO_PRED_SEMANTICS_UPDATE: 0
+  SEMANTIC_ENCODER:
+    rednet_ckpt: "data/rednet-models/rednet_semmap_mp3d_tuned.pth"
+    cnn_type: "ResnetSemSegEncoder"
+    output_size: 256
+    backbone: "resnet18"
+    train_encoder: True
+    embedding_size: 4
+    is_thda: True
+    num_classes: 29
+
+  RGB_ENCODER:
+    cnn_type: "resnet50_clip"  # ResnetRGBEncoder, None
+    output_size: 256
+    backbone: "resnet50"
+    train_encoder: False
+
+  DEPTH_ENCODER:
+    cnn_type: "VlnResnetDepthEncoder" # VlnResnetDepthEncoder, None
+    output_size: 128
+    backbone: "resnet50"
+    trainable: False
+    ddppo_checkpoint: "data/ddppo-models/gibson-2plus-resnet50.pth"
+
+  STATE_ENCODER:
+    num_hidden_layers: 4
+    num_attention_heads: 8
+    learnable_step_embedding: False
+    max_steps: 500
+
+    hidden_act: "gelu"
+    dropout_prob: 0.1
+    intermediate_size: 2048 #3072
+    layer_norm_eps: 1e-12
+    
+  SEQ2SEQ:
+    use_prev_action: True
+
+  PROGRESS_MONITOR:
+    use: False

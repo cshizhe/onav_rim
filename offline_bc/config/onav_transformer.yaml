@@ -1,0 +1,105 @@
+SEED: 2023
+output_dir: 'data/exprs_iros23_release/transformer/trn.all-rgb.rn50.clip-depth-layer.4-hidden.512-history.500-enc.concat-act.linear'
+resume_file: null
+resume_optimizer: null
+
+train_batch_size: 32
+val_batch_size: 64
+gradient_accumulation_steps: 1
+num_epochs: 40
+num_train_steps: null
+warmup_steps: 2500
+log_steps: 500
+valid_steps: 2500
+
+optim: 'adamw'
+learning_rate: 3e-4
+lr_sched: 'linear' # inverse_sqrt, linear
+betas: [0.9, 0.98]
+weight_decay: 0.01
+grad_norm: 5
+n_workers: 4
+pin_mem: True
+
+DATASET:
+  dataset_class: 'NavDemoDataset'
+  trn_scene_ids: '*' 
+  val_scene_ids: []
+  rgb_image_dir: null
+  semseg_dir: null
+  rgb_ft_dir: 'data/datasets/objectnav/mp3d_70k_demos_prefts/rgb_fts/clip'
+  depth_ft_dir: 'data/datasets/objectnav/mp3d_70k_demos_prefts/depth_fts'
+  meta_dir: 'data/datasets/objectnav/mp3d_70k_demos_prefts/meta_infos_lmdb'
+  num_ft_views: 1
+  rgb_image_size: 224
+  max_steps: 500
+  num_history_fts: 500
+  inflection_weight: 3.477512060914205
+  stop_weight: null
+  use_thda: True
+
+  gpscompass_noise_type: null # null, zero, gaussian
+
+  infer_visual_feature_task: False
+  max_future_step_size: 20
+  infer_depth_feature: False
+
+MODEL:
+  model_class: 'NavILTransformer'
+  action_clf_class: 'linear' # linear, ClsPrediction
+  encoder_type: 'concat' # concat, concat_linear, add
+  encoder_add_objgoal: True
+  hidden_size: 512
+  num_actions: 6  # stop, move forward, turn left, turn right, look up, look down
+
+  obj_embed_file: null
+  
+  dropout_rate: 0.1
+
+  USE_SEMANTICS: False
+  USE_PRED_SEMANTICS: False
+  SWITCH_TO_PRED_SEMANTICS_UPDATE: 0
+  embed_sge: False
+  SEMANTIC_ENCODER:
+    rednet_ckpt: "data/rednet-models/rednet_semmap_mp3d_tuned.pth"
+    cnn_type: "ResnetSemSegEncoder"
+    output_size: 256
+    backbone: "resnet18"
+    train_encoder: True
+    embedding_size: 4
+    is_thda: True
+    num_classes: 29
+
+  DEPTH_ENCODER:
+    cnn_type: "VlnResnetDepthEncoder" # VlnResnetDepthEncoder, None
+    output_size: 128
+    backbone: "resnet50"
+    trainable: False
+    ddppo_checkpoint: "data/ddppo-models/gibson-2plus-resnet50.pth"
+
+  RGB_ENCODER:
+    cnn_type: "resnet50_clip"  # ResnetRGBEncoder, resnet50_clip, resnet50_imagenet, resnet18_imagenet, None
+    output_size: 256
+    # specific configuration for ResnetRGBEncoder
+    backbone: "resnet50"
+    train_encoder: False
+    normalize_visual_inputs: False # specific for ResnetRGBEncoder
+
+  USE_GPS: True
+  USE_COMPASS: True
+  SEQ2SEQ:
+    use_prev_action: True
+
+  STATE_ENCODER:
+    rnn_type: "transformer"
+    num_hidden_layers: 4
+    num_attention_heads: 8
+    learnable_step_embedding: False
+    max_steps: 500
+
+    hidden_act: "gelu"
+    dropout_prob: 0.1
+    intermediate_size: 2048 #3072
+    layer_norm_eps: 1e-12
+
+
