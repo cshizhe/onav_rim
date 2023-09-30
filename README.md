@@ -1,6 +1,8 @@
 # Object Goal Navigation with Recursive Implicit Maps
 
-This repository is the official implementation of [Object Goal Navigation with Recursive Implicit Maps](https://arxiv.org/abs/2308.05602) ([project webpage](https://cshizhe.github.io/projects/vil3dref.html)).
+This repository is the official implementation of [Object Goal Navigation with Recursive Implicit Maps](https://arxiv.org/abs/2308.05602) (IROS 2023).
+
+[project webpage](https://www.di.ens.fr/willow/research/onav_rim/)
 
 ![Overview of RIM Model](media/teaser.png)
 
@@ -40,7 +42,7 @@ python setup.py develop --all
 
 2. Download datasets
 
-Follow the instructions in [habitat-web](https://github.com/Ram81/habitat-imitation-baselines#data) to download the MP3D scene dataset, object assets and demonstration datasets.
+Follow the instructions in [habitat-imitation-baselines](https://github.com/Ram81/habitat-imitation-baselines#data) to download the MP3D scene dataset, object assets and demonstration datasets.
 
 The data structure should look like this:
 ```
@@ -104,3 +106,14 @@ We provide a trained model in [Dropbox](https://www.dropbox.com/scl/fo/bk0ok8ibx
 ## Acknowledgements
 Some of the codes are built upon [habitat-imitation-baselines](https://github.com/Ram81/habitat-imitation-baselines/tree/master). Thanks them for their great work!
 
+
+## Citation
+If you find our work useful in your research, please consider citing:
+```
+@inproceedings{chen2023rim,
+    author={Shizhe Chen and Thomas Chabal and Ivan Laptev and Cordelia Schmid},
+    title={Object Goal Navigation with Recursive Implicit Maps},
+    booktitle={Proc. of The International Conference on Intelligent Robots and Systems (IROS)},
+    year={2023}
+}
+```
